@@ -1,6 +1,10 @@
+import logging
+
 from bs4 import BeautifulSoup
-import db_wrapper
 import requests
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def get_page(url: str) -> BeautifulSoup:
@@ -14,19 +18,20 @@ def get_page(url: str) -> BeautifulSoup:
     return BeautifulSoup(response.text, "html.parser")
 
 
-def _get_film_from_selector(page: BeautifulSoup) -> list:
+def get_film_from_selector(page: BeautifulSoup) -> list:
     """
     Получить список фотопленок из выпадающего списка
     :param page: страница с селектором
-    :return: [[url_value, film_name]]
+    :return: [(url_value, film_name), ...]
     """
     selector_values = page.find("select", {"name": "Film", "id": "Film", "class": "pulldown"})
     selector_list = selector_values.findAll("option")[3:-2]
-    films_list = []
+    film_list = []
     for single_option in selector_list:
-        films_list.append([single_option.attrs['value'], single_option.text])
+        film_list.append((single_option.attrs['value'], single_option.text))
 
-    return films_list
+    logger.info(f"film list from selector [(url_value, film_name), ...]:\n{film_list}")
+    return film_list
 
 
 def _get_notes_for_film(url: str) -> str:
@@ -43,44 +48,38 @@ def _get_notes_for_film(url: str) -> str:
     return ''.join(td_table)
 
 
-def _get_film_recept(url_to_recept: str) -> list:
+def get_film_recept(url_to_recept: str, temp_units = "C", time_units = "T") -> list:
     """
     Получить из таблицы список рецептов
     :param url_to_recept: ссылка на конкретную пленку
+    :param temp_units: Единицы измерения температуры (C/F)
+    :param time_units: Формат времени (T/D)
     :return: Список с рецептами
     """
-    page = get_page(
-        f'https://www.digitaltruth.com/devchart.php?Film={url_to_recept}&Developer=&mdc=Search&TempUnits=C&TimeUnits=T')
+    url_page = f'https://www.digitaltruth.com/devchart.php?Film={url_to_recept}&Developer=&mdc=Search&TempUnits={temp_units}&TimeUnits={time_units}'
+    page = get_page(url_page)
     recept_table = page.find("table", {"class": "mdctable sortable"})
     recept_table_body = recept_table.contents[1].findAll("td")
 
     recept_list = [recept_table_body[i:i + 9] for i in range(0, len(recept_table_body), 9)]
     return_recept = list()
     for current_recept in recept_list:
-        temp_recept = [current_recept[i].text for i in range(len(current_recept) - 1)]
-        if len(current_recept[8].contents) == 2:
-            notes = _get_notes_for_film(current_recept[8].contents[0].get('href'))
-            temp_recept.append(notes)
-        elif len(current_recept[8].contents) == 1:
-            notes = ""
-            temp_recept.append(notes)
-        else:
-            notes = ""
-            temp_recept.append(notes)
+        try:
+            temp_recept = [current_recept[i].text for i in range(len(current_recept) - 1)]
+            if len(current_recept[8].contents) == 2:
+                notes_col = _get_notes_for_film(current_recept[8].contents[0].get('href'))
+                temp_recept.append(notes_col)
+            elif len(current_recept[8].contents) == 1:
+                notes_col = ""
+                temp_recept.append(notes_col)
+            else:
+                notes_col = ""
+                temp_recept.append(notes_col)
 
-        return_recept.append(temp_recept)
+            return_recept.append(temp_recept)
+        except Exception as e:
+            logger.error(f"Error parsing recept page url - {url_page}\n{e}")
 
+    logger.info(return_recept)
     return return_recept
 
-
-def get_films(page: BeautifulSoup):
-    films_list = _get_film_from_selector(page)
-    #db_wrapper.upload_films_from_selector(films_list)
-    for idx in films_list:
-        try:
-            recept_lst = _get_film_recept(idx[0])
-            recept_from_bd = db_wrapper.get_film_recept(films_list[1])
-        except Exception as e:
-            print(e)
-        pass
-    pass
