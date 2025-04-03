@@ -30,7 +30,7 @@ def get_film_from_selector(page: BeautifulSoup) -> list:
     for single_option in selector_list:
         film_list.append((single_option.attrs['value'], single_option.text))
 
-    logger.info(f"film list from selector [(url_value, film_name), ...]:\n{film_list}")
+    logger.info(f"film list from selector [(url_value, film_name), ...]: {film_list}")
     return film_list
 
 

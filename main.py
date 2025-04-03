@@ -16,7 +16,7 @@ def update_db():
     try:
         page_html = parser_html.get_page(URL)
         film_list = parser_html.get_film_from_selector(page_html)
-        if  WRITE_TO_DB_FLAG:
+        if WRITE_TO_DB_FLAG:
             db_wrapper.upload_films_from_selector(film_list)
     except requests.HTTPError as e:
         logging.error(e)
