@@ -52,12 +52,12 @@ def upload_films_recepts(recepts_list: list, film_selector_name: str, check_new=
     _connection = sqlite3.connect("./film_db.db")
     _cursor = _connection.cursor()
 
-
+    # запись новых рецептов
     _cursor.execute('SELECT * FROM Film_recept WHERE Film_selector = ?', (film_selector_name,))
-    db_recepts = [tuple(film) for film in _cursor.fetchall()]
+    db_recepts = [tuple(film[:9]) for film in _cursor.fetchall()]
     logger.info(f"film from db: {db_recepts}")
     newest_recepts = list(set(recepts_list) - set(db_recepts)) if check_new else recepts_list
-    logger.info(f"Upload to db: {newest_recepts}")
+    logger.info(f"Upload to db len {len(newest_recepts)}: {newest_recepts}")
     for recept in newest_recepts:
         _cursor.execute("INSERT INTO Film_recept (Film, Developer, Dilution, ISO, mm35, mm120, Sheet, Temp, Notes, Film_selector, Myself_recept, Forward)"
                         " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (recept[0], recept[1], recept[2], recept[3], recept[4], recept[5], recept[6], recept[7], recept[8], film_selector_name, 0, 0))
