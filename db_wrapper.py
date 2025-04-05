@@ -40,14 +40,28 @@ def upload_films_from_selector(film_list: list, check_new=True):
     _connection.close()
 
 
-def upload_films_recept(films_list: list):
-    pass
+def upload_films_recepts(recepts_list: list, film_selector_name: str, check_new=True):
+    """
+    Загрузка списка с рецептами фотопленок
+    :param recepts_list: Список рецептов
+    :param film_selector_name: Название фотопленки из селектора
+    :param check_new: Запись только новых рецептов
+    :return:
+    """
+
+    _connection = sqlite3.connect("./film_db.db")
+    _cursor = _connection.cursor()
 
 
-def get_film_recept(film_name: str) -> list:
-    """
-    Получить рецепт фотопленки из БД
-    :param film_name: Название фотопленки
-    :return: список рецептов фотопленки из БД
-    """
-    pass
+    _cursor.execute('SELECT * FROM Film_recept WHERE Film_selector = ?', (film_selector_name,))
+    db_recepts = [tuple(film) for film in _cursor.fetchall()]
+    logger.info(f"film from db: {db_recepts}")
+    newest_recepts = list(set(recepts_list) - set(db_recepts)) if check_new else recepts_list
+    logger.info(f"Upload to db: {newest_recepts}")
+    for recept in newest_recepts:
+        _cursor.execute("INSERT INTO Film_recept (Film, Developer, Dilution, ISO, mm35, mm120, Sheet, Temp, Notes, Film_selector, Myself_recept, Forward)"
+                        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (recept[0], recept[1], recept[2], recept[3], recept[4], recept[5], recept[6], recept[7], recept[8], film_selector_name, 0, 0))
+
+    _connection.commit()
+    _connection.close()
+

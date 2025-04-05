@@ -48,7 +48,7 @@ def _get_notes_for_film(url: str) -> str:
     return ''.join(td_table)
 
 
-def get_film_recept(url_to_recept: str, temp_units = "C", time_units = "T") -> list:
+def get_film_recepts(url_to_recept: str, temp_units = "C", time_units = "T") -> list:
     """
     Получить из таблицы список рецептов
     :param url_to_recept: ссылка на конкретную пленку
@@ -76,10 +76,10 @@ def get_film_recept(url_to_recept: str, temp_units = "C", time_units = "T") -> l
                 notes_col = ""
                 temp_recept.append(notes_col)
 
-            return_recept.append(temp_recept)
+            return_recept.append(tuple(temp_recept))
         except Exception as e:
             logger.error(f"Error parsing recept page url - {url_page}\n{e}")
 
-    logger.info(return_recept)
+    logger.info(f"recepts from '{url_to_recept}' :{return_recept}")
     return return_recept
 
