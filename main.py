@@ -3,12 +3,15 @@ import requests
 import parser_html
 import logging
 import db_wrapper
+import flask
 
 logging.basicConfig(level=logging.INFO, filename="./log.log", filemode="w",
                     format="%(asctime)s [%(levelname)s - %(module)10s -  %(funcName)20s()] %(message)s",
                     datefmt="%%d-%m-%Y %H:%M:%S")
 logger = logging.getLogger(__name__)
+app = flask.Flask(__name__)
 
+# CONST
 URL = "https://www.digitaltruth.com/devchart.php"
 WRITE_TO_DB_FLAG = True
 
@@ -26,8 +29,19 @@ def update_db():
     except requests.HTTPError as e:
         logging.error(e)
 
-def main():
-    update_db()
+@app.route('/check')
+def default_route():
+    return  {"error": False, "message": "None", "content":"ok"}
+
+
+@app.route('/get_selector_list')
+def get_selector_list():
+    req_selector = flask.request.get_json()
+    selector_list = db_wrapper.get_selector_list()
+
+    return  sorted(selector_list, key= lambda tup: tup[1])
+
+
 
 if __name__ == '__main__':
-    main()
+    app.run(host='0.0.0.0', port=5000, debug=True)

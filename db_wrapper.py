@@ -65,3 +65,18 @@ def upload_films_recepts(recepts_list: list, film_selector_name: str, check_new=
     _connection.commit()
     _connection.close()
 
+def get_selector_list():
+    """
+    Получить записи из БД фотопленок из селектора
+    :return: Список фотопленок
+    """
+    _connection = sqlite3.connect("./film_db.db")
+    _cursor = _connection.cursor()
+
+    _cursor.execute('SELECT * FROM Film_selector_name')
+    from_db = [tuple(film) for film in _cursor.fetchall()]
+
+    _connection.commit()
+    _connection.close()
+
+    return from_db
