@@ -59,13 +59,17 @@ def upload_films_recepts(recepts_list: list, film_selector_name: str, check_new=
     newest_recepts = list(set(recepts_list) - set(db_recepts)) if check_new else recepts_list
     logger.info(f"Upload to db len {len(newest_recepts)}: {newest_recepts}")
     for recept in newest_recepts:
-        _cursor.execute("INSERT INTO Film_recept (Film, Developer, Dilution, ISO, mm35, mm120, Sheet, Temp, Notes, Film_selector, Myself_recept, Forward)"
-                        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (recept[0], recept[1], recept[2], recept[3], recept[4], recept[5], recept[6], recept[7], recept[8], film_selector_name, 0, 0))
+        _cursor.execute(
+            "INSERT INTO Film_recept (Film, Developer, Dilution, ISO, mm35, mm120, Sheet, Temp, Notes, Film_selector, Myself_recept, Forward)"
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (
+            recept[0], recept[1], recept[2], recept[3], recept[4], recept[5], recept[6], recept[7], recept[8],
+            film_selector_name, False, False))
 
     _connection.commit()
     _connection.close()
 
-def get_selector_list():
+
+def get_all_selector_list():
     """
     Получить записи из БД фотопленок из селектора
     :return: Список фотопленок
@@ -80,3 +84,56 @@ def get_selector_list():
     _connection.close()
 
     return from_db
+
+
+def get_recept_by_selector(selector_film: str):
+    """
+    Получить список рецептов по селектору
+    :param selector_film: Название фотопленки
+    :return: Список рецептов
+    """
+    _connection = sqlite3.connect("./film_db.db")
+    _cursor = _connection.cursor()
+
+    _cursor.execute('SELECT * FROM Film_recept WHERE Film_selector = ?', (selector_film,))
+    recepts_by_selector = [tuple(film[:9]) for film in _cursor.fetchall()]
+
+    return recepts_by_selector
+
+
+
+def get_forward() -> list:
+    """
+    Получить список избранных рецептов
+    :return: Список избранных рецептов
+    """
+    _connection = sqlite3.connect("./film_db.db")
+    _cursor = _connection.cursor()
+
+    # запись новых рецептов
+    _cursor.execute('SELECT * FROM Film_recept WHERE Forward = 1')
+    forward_recepts = [tuple(film[:9]) for film in _cursor.fetchall()]
+
+    _connection.commit()
+    _connection.close()
+
+    return  forward_recepts
+
+
+
+def get_myself() -> list:
+    """
+    Получить список самосозданных рецептов
+    :return: Список самосозданных рецептов
+    """
+    _connection = sqlite3.connect("./film_db.db")
+    _cursor = _connection.cursor()
+
+    # запись новых рецептов
+    _cursor.execute('SELECT * FROM Film_recept WHERE Myself_recept = 1')
+    forward_recepts = [tuple(film[:9]) for film in _cursor.fetchall()]
+
+    _connection.commit()
+    _connection.close()
+
+    return  forward_recepts

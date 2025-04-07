@@ -36,11 +36,61 @@ def default_route():
 
 @app.route('/get_selector_list')
 def get_selector_list():
-    req_selector = flask.request.get_json()
-    selector_list = db_wrapper.get_selector_list()
+    error = False
+    message = ""
+    content = ""
+    try:
+        selector_list = db_wrapper.get_all_selector_list()
+        content = sorted(selector_list, key = lambda tup: tup[1])
+    except Exception as e:
+        error = True
+        message = str(e)
 
-    return  sorted(selector_list, key= lambda tup: tup[1])
 
+    return  {"error": False, "message": message, "content":content}
+
+@app.route('/get_recepts_by_selector', methods=['POST'])
+def get_film_by_selector():
+    error = False
+    message = ""
+    content = ""
+    try:
+        req_selector = flask.request.get_json()
+        film_by_selector = db_wrapper.get_recept_by_selector(req_selector["selector"])
+        content = sorted(film_by_selector, key = lambda tup: tup[1])
+    except Exception as e:
+        error = True
+        message = str(e)
+
+    return {"error":error, "message":message, "content":content}
+
+
+@app.route('/forward')
+def forward():
+    error = False
+    message = ""
+    content = ""
+    try:
+        content = db_wrapper.get_forward()
+    except Exception as e:
+        error = True
+        message = str(e)
+
+    return {"error":error, "message":message, "content":content}
+
+
+@app.route('/myself')
+def myself():
+    error = False
+    message = ""
+    content = ""
+    try:
+        content = db_wrapper.get_myself()
+    except Exception as e:
+        error = True
+        message = str(e)
+
+    return {"error":error, "message":message, "content":content}
 
 
 if __name__ == '__main__':
