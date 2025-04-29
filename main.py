@@ -9,8 +9,8 @@ import configparser
 import time
 
 logging.basicConfig(level=logging.INFO, filename="./log.log", filemode="w",
-                    format="%(asctime)s [%(levelname)s - %(module)10s -  %(funcName)20s()] %(message)s",
-                    datefmt="%%d-%m-%Y %H:%M:%S")
+                    format="%(asctime)s [%(levelname)s] %(message)s",
+                    datefmt="%d-%m-%Y %H:%M:%S")
 logger = logging.getLogger(__name__)
 app = flask.Flask(__name__)
 
@@ -28,16 +28,21 @@ def update_db():
         page_html = parser_html.get_page(URL)
         film_list = parser_html.get_film_from_selector(page_html)
         for film in film_list:
-            film_recepts = parser_html.get_film_recepts(film[0])
-            if WRITE_TO_DB_FLAG:
-                db_wrapper.upload_films_recepts(film_recepts, film[1])
+            try:
+                film_recepts = parser_html.get_film_recepts(film[0])
+                if WRITE_TO_DB_FLAG:
+                    logger.info(f'write to db "{film[1]}" len of recepts {len(film_recepts)}')
+                    db_wrapper.upload_films_recepts(film_recepts)
+            except Exception as e:
+                logger.error(f"error in {film}")
+                logger.error(e)
 
     except requests.HTTPError as e:
         logging.error(e)
 
 @app.route('/check')
 def default_route():
-    return  {"error": False, "message": "", "content":"ok"}
+    return  "ok"
 
 
 

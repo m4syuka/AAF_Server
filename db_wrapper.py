@@ -4,27 +4,34 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def upload_films_recepts(recepts_list: list, film_selector_name: str):
+
+def upload_films_recepts(recepts_list: list):
     """
-    Загрузка списка с рецептами фотопленок
+    Сохранение списка с рецептами фотопленок
     :param recepts_list: Список рецептов
-    :param film_selector_name: Название фотопленки из селектора
-    :param check_new: Запись только новых рецептов
     :return:
     """
 
-    _connection = sqlite3.connect("./film_db.db")
+    _connection = sqlite3.connect("./film.db")
     _cursor = _connection.cursor()
 
-
-    logger.info(f"Upload to db len {len(recepts_list)}: {recepts_list}")
     for recept in recepts_list:
-        _cursor.execute(
-            "INSERT INTO Film_recept (Film, Developer, Dilution, ISO, mm35, mm120, Sheet, Temp, Notes, Forward_recept)"
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (
-            recept[0], recept[1], recept[2], recept[3], recept[4], recept[5], recept[6], recept[7], recept[8], False))
+        try:
+            _cursor.execute('''
+                INSERT OR IGNORE INTO Film_recept 
+                VALUES (?,?,?,?,?,?,?,?,?,?)
+            ''', (
+                recept[0], recept[1], recept[2],
+                recept[3], recept[4], recept[5],
+                recept[6], recept[7], recept[8],
+                "0"
+            ))
+            _connection.commit()
+        except sqlite3.IntegrityError as e:
+            continue
 
-    _connection.commit()
+    _connection.close()
+
     _connection.close()
 
 

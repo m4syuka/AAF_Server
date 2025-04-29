@@ -16,7 +16,20 @@ CREATE TABLE "Film_recept" (
 	"Sheet"	TEXT,
 	"Temp"	TEXT,
 	"Notes"	TEXT,
-	"Forword_recept"	TEXT
+	"Forward_recept"	TEXT
+);
+
+CREATE UNIQUE INDEX "idx_full_unique" ON "Film_recept" (
+	"Film",
+	"Developer",
+	"Dilution",
+	"ISO",
+	"mm35",
+	"mm120",
+	"Sheet",
+	"Temp",
+	"Notes",
+	"Forward_recept"
 );
 ```
 ## Сервер
@@ -33,10 +46,26 @@ CREATE TABLE "Film_recept" (
 ```
 ### Роуты
 
-* `/check` `GET` Проверка состояния сервера
-  * `Ответ` ok
-
-* `/forward` `GET` Список избранных рецептов
+* `/film_list` `GET` Получить список фотопленок
+  * `Ответ` 
+  * ```json 
+    {
+      "error": ... ,
+      "message": ...,
+      "content": {
+        [recept],
+        [recept],
+        ...  
+      }    
+    }
+    ```
+* `/get_by_name` `GET` Получить рецепт определенной фотопленки
+  * `Запрос`
+  * ```json
+    {
+      "name": "Название фотопленки"
+    }
+    ```
 
 
 ## Docker

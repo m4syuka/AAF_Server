@@ -80,6 +80,5 @@ def get_film_recepts(url_to_recept: str, temp_units = "C", time_units = "T") -> 
         except Exception as e:
             logger.error(f"Error parsing recept page url - {url_page}\n{e}")
 
-    logger.info(f"recepts from '{url_to_recept}' :{return_recept}")
     return return_recept
 
