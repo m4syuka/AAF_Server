@@ -32,41 +32,34 @@ def upload_films_recepts(recepts_list: list):
 
     _connection.close()
 
-    _connection.close()
 
+def get_list_of_films():
+    """
+    Получить список уникальных фотопленок
+    :return: list
+    """
 
-def get_forward() -> list:
-    """
-    Получить список избранных рецептов
-    :return: Список избранных рецептов
-    """
-    _connection = sqlite3.connect("./film_db.db")
+    _connection = sqlite3.connect("./film.db")
     _cursor = _connection.cursor()
 
-    # запись новых рецептов
-    _cursor.execute('SELECT * FROM Film_recept WHERE Forward = 1')
-    forward_recepts = [tuple(film[:9]) for film in _cursor.fetchall()]
+    _cursor.execute('SELECT DISTINCT Film FROM Film_recept')
 
-    _connection.commit()
+    films = _cursor.fetchall()
+
     _connection.close()
 
-    return  forward_recepts
+    return {"len":len(films),
+            "list":list(film[0] for film in films)}
 
 
-
-def get_myself() -> list:
-    """
-    Получить список самосозданных рецептов
-    :return: Список самосозданных рецептов
-    """
-    _connection = sqlite3.connect("./film_db.db")
+def film_by_name(film_name: str):
+    _connection = sqlite3.connect("./film.db")
     _cursor = _connection.cursor()
 
-    # запись новых рецептов
-    _cursor.execute('SELECT * FROM Film_recept WHERE Myself_recept = 1')
-    forward_recepts = [tuple(film[:9]) for film in _cursor.fetchall()]
+    _cursor.execute('SELECT Film = ? FROM Film_recept', (film_name,))
 
-    _connection.commit()
+    films = _cursor.fetchall()
+
     _connection.close()
 
-    return  forward_recepts
+    return films

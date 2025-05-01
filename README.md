@@ -53,9 +53,10 @@ CREATE UNIQUE INDEX "idx_full_unique" ON "Film_recept" (
       "error": ... ,
       "message": ...,
       "content": {
-        [recept],
-        [recept],
-        ...  
+        "len" "размер_списка",
+        "list"[
+          список фотопленок
+        ]   
       }    
     }
     ```

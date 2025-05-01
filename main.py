@@ -3,7 +3,7 @@ import requests
 import parser_html
 import logging
 import db_wrapper
-import flask
+from flask import Flask, request
 import threading
 import configparser
 import time
@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO, filename="./log.log", filemode="w",
                     format="%(asctime)s [%(levelname)s] %(message)s",
                     datefmt="%d-%m-%Y %H:%M:%S")
 logger = logging.getLogger(__name__)
-app = flask.Flask(__name__)
+app = Flask(__name__)
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -44,29 +44,30 @@ def update_db():
 def default_route():
     return  "ok"
 
-
-
-@app.route('/forward')
-def forward():
-    error = False
-    message = ""
-    content = ""
+@app.route('/film_list', methods=['GET'])
+def film_list():
+    error_flag = False
+    error_message = ""
+    result = ""
     try:
-        content = db_wrapper.get_forward()
+        result = db_wrapper.get_list_of_films()
     except Exception as e:
-        error = True
-        message = str(e)
+        error_flag = True
+        error_message = e
 
-    return {"error":error, "message":message, "content":content}
+    return {
+        "error_flag": error_flag,
+        "error_message": str(error_message),
+        "result": result
+    }
 
 
-@app.route('/film')
-def film():
+@app.route("film_by_name", methods=['GET'])
+def film_by_name(name):
     pass
 
-
 if __name__ == '__main__':
-    # update_db_trhead = threading.Thread(target=update_db)
-    # update_db_trhead.start()
-    # app.run(host='0.0.0.0', port=5000, debug=True)
-    update_db()
+    update_db_trhead = threading.Thread(target=update_db)
+    update_db_trhead.start()
+    app.run(host='0.0.0.0', port=5000, debug=True)
+    # update_db()
