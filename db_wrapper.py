@@ -52,11 +52,11 @@ def get_list_of_films():
             "list":list(film[0] for film in films)}
 
 
-def film_by_name(film_name: str):
+def recepts_by_name(film_name: str):
     _connection = sqlite3.connect("./film.db")
     _cursor = _connection.cursor()
 
-    _cursor.execute('SELECT Film = ? FROM Film_recept', (film_name,))
+    _cursor.execute('SELECT * FROM Film_recept WHERE Film = ?', (film_name,))
 
     films = _cursor.fetchall()
 

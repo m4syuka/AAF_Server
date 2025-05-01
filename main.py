@@ -62,9 +62,23 @@ def film_list():
     }
 
 
-@app.route("film_by_name", methods=['GET'])
-def film_by_name(name):
-    pass
+@app.route("/recepts_by_name", methods=['POST'])
+def film_by_name():
+    error_flag = False
+    error_message = ""
+    result = ""
+    try:
+        film_name = request.get_json()['film_name']
+        result = db_wrapper.recepts_by_name(film_name)
+    except Exception as e:
+        error_flag = True
+        error_message = e
+
+    return {
+        "error_flag": error_flag,
+        "error_message": str(error_message),
+        "result": result
+    }
 
 if __name__ == '__main__':
     update_db_trhead = threading.Thread(target=update_db)

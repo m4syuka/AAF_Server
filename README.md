@@ -62,11 +62,21 @@ CREATE UNIQUE INDEX "idx_full_unique" ON "Film_recept" (
     ```
 * `/get_by_name` `GET` Получить рецепт определенной фотопленки
   * `Запрос`
-  * ```json
+  ```json
     {
       "name": "Название фотопленки"
     }
     ```
+  * `Ответ`
+  ```json
+    {
+      "recepts": [
+        рецепт 1,
+        рецепт 2,
+        ...
+        ] 
+    }
+  ```
 
 
 ## Docker
