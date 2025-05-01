@@ -33,10 +33,10 @@ def upload_films_recepts(recepts_list: list):
     _connection.close()
 
 
-def get_list_of_films():
+def get_list_size() -> int:
     """
-    Получить список уникальных фотопленок
-    :return: list
+    Получить количество уникальных фотопленок
+    :return: количество
     """
 
     _connection = sqlite3.connect("./film.db")
@@ -48,8 +48,33 @@ def get_list_of_films():
 
     _connection.close()
 
-    return {"len":len(films),
-            "list":list(film[0] for film in films)}
+    return len(list(film[0] for film in films))
+
+
+def get_film_list_step(start: int, end:int) -> list():
+    """
+    Получить список фотолпенок согласно диапозону
+    :param start: стартовая позиция
+    :param end: конечная позиция
+    :return: список фотопленок
+    """
+
+    _connection = sqlite3.connect("./film.db")
+    _cursor = _connection.cursor()
+
+    _cursor.execute('SELECT DISTINCT Film FROM Film_recept')
+
+    films = list()
+    if start == -1 and end == -1:
+        films = _cursor.fetchall()
+    elif start == -1 or end == -1:
+        raise Exception(f'error start or end index. {start}, {end}')
+    else:
+        films = _cursor.fetchall()[start:end]
+
+    _connection.close()
+
+    return list(film[0] for film in films)
 
 
 def recepts_by_name(film_name: str, recept_idx: int):

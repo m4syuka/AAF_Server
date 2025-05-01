@@ -51,13 +51,14 @@ def update_db():
 def default_route():
     return  "ok"
 
-@app.route('/film_list', methods=['GET'])
+@app.route('/film_list', methods=['POST'])
 def film_list():
     error_flag = False
     error_message = ""
     result = ""
     try:
-        result = db_wrapper.get_list_of_films()
+        req_json = request.get_json()
+        result = db_wrapper.get_film_list_step(req_json['start'], req_json['end'])
     except Exception as e:
         error_flag = True
         error_message = e
@@ -85,6 +86,24 @@ def film_by_name():
         "error_flag": error_flag,
         "error_message": str(error_message),
         "result": result
+    }
+
+
+@app.route("/film_size", methods=['GET'])
+def films_size():
+    error_flag = False
+    error_message = ""
+    result = ""
+    try:
+        result = db_wrapper.get_list_size()
+    except Exception as e:
+        error_flag = True
+        error_message = e
+
+    return {
+        "error_flag": error_flag,
+        "error_message": str(error_message),
+        "content": result
     }
 
 
