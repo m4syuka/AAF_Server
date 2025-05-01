@@ -7,10 +7,17 @@ from flask import Flask, request
 import threading
 import configparser
 import time
+import sys
 
-logging.basicConfig(level=logging.INFO, filename="./log.log", filemode="w",
-                    format="%(asctime)s [%(levelname)s] %(message)s",
-                    datefmt="%d-%m-%Y %H:%M:%S")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%d-%m-%Y %H:%M:%S",
+    handlers=[
+        logging.FileHandler("./log.log", mode="w"),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
 logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
@@ -68,8 +75,8 @@ def film_by_name():
     error_message = ""
     result = ""
     try:
-        film_name = request.get_json()['film_name']
-        result = db_wrapper.recepts_by_name(film_name)
+        film_name = request.get_json()
+        result = db_wrapper.recepts_by_name(film_name["name"], film_name["idx"])
     except Exception as e:
         error_flag = True
         error_message = e
@@ -80,8 +87,9 @@ def film_by_name():
         "result": result
     }
 
+
 if __name__ == '__main__':
-    update_db_trhead = threading.Thread(target=update_db)
-    update_db_trhead.start()
+    # update_db_trhead = threading.Thread(target=update_db)
+    # update_db_trhead.start()
     app.run(host='0.0.0.0', port=5000, debug=True)
     # update_db()

@@ -1,5 +1,4 @@
 .venv/
 .idea/
-.__pa
 /__pycache__
-film_db.db
+log.log
