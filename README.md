@@ -103,5 +103,10 @@ CREATE UNIQUE INDEX "idx_full_unique" ON "Film_recept" (
 ## Docker
 ### 1. Сборка
 ```bash
+sudo docker build --network=host -t aaf_server .
+```
 
+### 2. Запуск
+```bash
+sudo docker run -d -p 5000:5000  aaf_server
 ```
