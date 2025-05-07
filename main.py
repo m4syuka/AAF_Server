@@ -8,6 +8,7 @@ import threading
 import configparser
 import time
 import sys
+import flask_cors
 
 logging.basicConfig(
     level=logging.INFO,
@@ -20,6 +21,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 app = Flask(__name__)
+flask_cors.CORS(app)
 
 config = configparser.ConfigParser()
 config.read('config.ini')
