@@ -53,60 +53,84 @@ def update_db():
 def default_route():
     return  "ok"
 
-@app.route('/film_list', methods=['POST'])
-def film_list():
-    error_flag = False
-    error_message = ""
-    result = ""
-    try:
-        req_json = request.get_json()
-        result = db_wrapper.get_film_list_step(req_json['start'], req_json['end'])
-    except Exception as e:
-        error_flag = True
-        error_message = e
-
-    return {
-        "error_flag": error_flag,
-        "error_message": str(error_message),
-        "result": result
-    }
-
-
-@app.route("/recepts_by_name", methods=['POST'])
-def film_by_name():
-    error_flag = False
-    error_message = ""
-    result = ""
-    try:
-        film_name = request.get_json()
-        result = db_wrapper.recepts_by_name(film_name["name"], film_name["idx"])
-    except Exception as e:
-        error_flag = True
-        error_message = e
-
-    return {
-        "error_flag": error_flag,
-        "error_message": str(error_message),
-        "result": result
-    }
-
-
 @app.route("/film_size", methods=['GET'])
 def films_size():
     error_flag = False
-    error_message = ""
     result = ""
     try:
         result = db_wrapper.get_list_size()
     except Exception as e:
         error_flag = True
-        error_message = e
 
     return {
-        "error_flag": error_flag,
-        "error_message": str(error_message),
-        "content": result
+        "err": error_flag,
+        "res": result
     }
+
+
+@app.route("/film_list_all", methods=['GET'])
+def film_list_all():
+    error_flag = False
+    result = ""
+    try:
+        result = db_wrapper.get_film_list_step(0, db_wrapper.get_list_size())
+    except Exception as e:
+        error_flag = True
+
+    return {
+        "err": error_flag,
+        "res": result
+    }
+
+
+@app.route("/dev_by_film", methods=['POST'])
+def dev_by_film():
+    error_flag = False
+    result = ""
+    try:
+        req_json = request.get_json()
+        result = db_wrapper.get_developer_by_film_name(req_json["film"])
+    except Exception as e:
+        error_flag = True
+
+    return {
+        "err": error_flag,
+        "res": result
+    }
+
+
+@app.route("/iso_by_dev_film", methods=['POST'])
+def iso_by_dev_film():
+    error_flag = False
+    result = ""
+    try:
+        req_json = request.get_json()
+        result = db_wrapper.get_iso_by_dev_and_film(req_json["film"], req_json["dev"])
+    except Exception as e:
+        error_flag = True
+
+    return {
+        "err": error_flag,
+        "res": result
+    }
+
+
+@app.route("/time_by_iso_dev_film_frmt", methods=['POST'])
+def time_by_iso_dev_film():
+    error_flag = False
+    result = ""
+    try:
+        req_json = request.get_json()
+        result = db_wrapper.get_time_by_iso_dev_film(req_json["film"], req_json["dev"], req_json["ISO"], req_json["frmt"])
+    except Exception as e:
+        error_flag = True
+
+    return {
+        "err": error_flag,
+        "res": result
+    }
+
+
 
 
 if __name__ == '__main__':
