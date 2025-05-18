@@ -121,7 +121,7 @@ def time_by_iso_dev_film():
     result = ""
     try:
         req_json = request.get_json()
-        result = db_wrapper.get_time_by_iso_dev_film(req_json["film"], req_json["dev"], req_json["ISO"], req_json["frmt"])
+        result = db_wrapper.get_time_by_iso_dev_film(req_json["film"], req_json["dev"], req_json["iso"], req_json["frmt"])
     except Exception as e:
         error_flag = True
 

@@ -133,6 +133,7 @@ def get_time_by_iso_dev_film(film_name: str, dev_name:str, ISO:str, frmt:str):
             start = int(recept[0].split('-')[0])
             end = int(recept[0].split('-')[1])
             for i in range(start, end + 1):
+
                 rec_dict[i] = recept[1]
         else:
             rec_dict[recept[0]] = recept[1]
